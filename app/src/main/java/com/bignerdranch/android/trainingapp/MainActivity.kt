@@ -1,20 +1,16 @@
 package com.bignerdranch.android.trainingapp
 
-import android.content.ContentResolver
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.ContactsContract
-import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bignerdranch.android.trainingapp.recyclerview.ContactsAdapter
-import org.w3c.dom.Text
 
 class MainActivity : AppCompatActivity() {
     private val contacts = mutableListOf<String>()
