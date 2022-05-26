@@ -15,6 +15,17 @@
         android:layout_height="wrap_content"
         android:padding="5dp"/>
 
+    <TextView
+        android:id="@+id/hint_text_view"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Здесь будет отображаться список контактов"
+        android:textSize="16sp"/>
+
     <Button
         app:layout_constraintTop_toBottomOf="@+id/contacts_recycler_view"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -23,6 +34,7 @@
         android:id="@+id/get_contacts_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/get_contacts_button_text"/>
+        android:text="@string/get_contacts_button_text"
+        android:layout_margin="10dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
