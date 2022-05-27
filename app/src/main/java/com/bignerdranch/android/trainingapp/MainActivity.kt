@@ -1,85 +1,101 @@
 package com.bignerdranch.android.trainingapp
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.ContactsContract
-import android.widget.Button
-import android.widget.TextView
+import android.os.IBinder
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isGone
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.bignerdranch.android.trainingapp.databinding.ActivityMainBinding
 import com.bignerdranch.android.trainingapp.recyclerview.ContactsAdapter
 
 class MainActivity : AppCompatActivity() {
-    private val contacts = mutableListOf<String>()
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var service: ContactsService
+    private var isServiceBound = false
+
+    private val viewModel by lazy {
+        ViewModelProvider(this).get(MainActivityViewModel::class.java)
+    }
+
+    private val connection = object : ServiceConnection {
+        override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
+            p1?.let {
+                val binder = it as ContactsService.ContactsBinder
+                service = binder.getService()
+                isServiceBound = true
+            }
+        }
+
+        override fun onServiceDisconnected(p0: ComponentName?) {
+            isServiceBound = false
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val button = findViewById<Button>(R.id.get_contacts_button)
+        binding.contactsList.layoutManager = LinearLayoutManager(this)
 
-        val contactsList = findViewById<RecyclerView>(R.id.contacts_recycler_view).apply {
-            layoutManager = LinearLayoutManager(this@MainActivity)
-        }
-
-        val hint = findViewById<TextView>(R.id.hint_text_view)
-
-        hint.isGone = contacts.size == 0
-
-        button.setOnClickListener {
-            val cursor = contentResolver.query(
-                ContactsContract.Contacts.CONTENT_URI,
-                null,
-                null,
-                null
-            )
-
-            cursor?.let {
-                while (it.moveToNext()) {
-                    val columnIndex = it.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY)
-
-                    if (columnIndex >= 0) {
-                        contacts.add(it.getString(columnIndex))
-                    }
-                }
-
-                contactsList.adapter = ContactsAdapter(contacts)
-                button.isGone = true
-
-                it.close()
+        binding.getContactsButton.setOnClickListener {
+            Log.d("MainActivity", checkPermission().toString())
+            if (isServiceBound && checkPermission()) {
+                updateUI()
+            } else {
+                Log.d("MainActivity", "Request")
+                requestPermission()
             }
         }
     }
 
     override fun onStart() {
         super.onStart()
-
-        if (ActivityCompat
-                .checkSelfPermission(
-                    this,
-                    android.Manifest.permission.READ_CONTACTS
-                ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(android.Manifest.permission.READ_CONTACTS),
-                REQUEST_CODE_CONTACTS
-            )
+        Intent(this, ContactsService::class.java).also { intent ->
+            bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    override fun onStop() {
+        super.onStop()
+        unbindService(connection)
+        isServiceBound = false
     }
 
+    private fun getContacts(): List<String> {
+        if (viewModel.contacts == null) {
+            viewModel.contacts = service.loadContacts()
+        }
+
+        return viewModel.contacts!!
+    }
+
+    private fun updateUI() {
+        val contacts = getContacts()
+        binding.contactsList.adapter = ContactsAdapter(contacts)
+        binding.hintTextView.isGone = contacts.isNotEmpty()
+    }
+
+    private fun checkPermission() = ActivityCompat.checkSelfPermission(
+        this,
+        android.Manifest.permission.READ_CONTACTS
+    ) == PackageManager.PERMISSION_GRANTED
+
+    private fun requestPermission() = ActivityCompat.requestPermissions(
+        this,
+        arrayOf(android.Manifest.permission.READ_CONTACTS),
+        REQUEST_CODE_CONTACTS
+    )
+
     companion object {
-        const val REQUEST_CODE_CONTACTS = 1
+        private const val REQUEST_CODE_CONTACTS = 1
     }
 }

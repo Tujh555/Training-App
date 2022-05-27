@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Training App</string>
     <string name="get_contacts_button_text">Get Contacts</string>
+    <string name="hint_text">Здесь будет отображаться список контактов</string>
 </resources>
