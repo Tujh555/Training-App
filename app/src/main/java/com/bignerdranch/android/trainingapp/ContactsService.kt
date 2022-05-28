@@ -37,6 +37,6 @@ class ContactsService : Service() {
     }
 
     inner class ContactsBinder : Binder() {
-        fun getService() = this@ContactsService
+        fun getService(): ContactsService = this@ContactsService
     }
 }

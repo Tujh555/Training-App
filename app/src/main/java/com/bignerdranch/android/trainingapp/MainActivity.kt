@@ -17,13 +17,22 @@ import com.bignerdranch.android.trainingapp.databinding.ActivityMainBinding
 import com.bignerdranch.android.trainingapp.recyclerview.ContactsAdapter
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
     private lateinit var service: ContactsService
     private var isServiceBound = false
 
     private val viewModel by lazy {
         ViewModelProvider(this).get(MainActivityViewModel::class.java)
     }
+
+    private val binding: ActivityMainBinding by lazy {
+        ActivityMainBinding.inflate(layoutInflater)
+    }
+
+    private val permissionContactsReceived: Boolean
+        get() = ActivityCompat.checkSelfPermission(
+            this,
+            android.Manifest.permission.READ_CONTACTS
+        ) == PackageManager.PERMISSION_GRANTED
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
@@ -41,33 +50,51 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         binding.contactsList.layoutManager = LinearLayoutManager(this)
 
         binding.getContactsButton.setOnClickListener {
-            Log.d("MainActivity", checkPermission().toString())
-            if (isServiceBound && checkPermission()) {
+            if (isServiceBound && permissionContactsReceived) {
                 updateUI()
             } else {
-                Log.d("MainActivity", "Request")
-                requestPermission()
+                requestContactsPermission()
             }
         }
     }
 
     override fun onStart() {
         super.onStart()
-        Intent(this, ContactsService::class.java).also { intent ->
-            bindService(intent, connection, Context.BIND_AUTO_CREATE)
-        }
+
+        bindContactsService()
     }
 
     override fun onStop() {
         super.onStop()
+
         unbindService(connection)
         isServiceBound = false
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == REQUEST_CODE_CONTACTS
+            && grantResults.isNotEmpty()
+            && grantResults[0] == PackageManager.PERMISSION_GRANTED
+        ) {
+            bindContactsService()
+        }
+    }
+
+    private fun bindContactsService() {
+        Intent(this, ContactsService::class.java).also { intent ->
+            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
     }
 
     private fun getContacts(): List<String> {
@@ -75,25 +102,23 @@ class MainActivity : AppCompatActivity() {
             viewModel.contacts = service.loadContacts()
         }
 
-        return viewModel.contacts!!
+        return viewModel.contacts ?: emptyList()
     }
 
     private fun updateUI() {
         val contacts = getContacts()
+
         binding.contactsList.adapter = ContactsAdapter(contacts)
         binding.hintTextView.isGone = contacts.isNotEmpty()
     }
 
-    private fun checkPermission() = ActivityCompat.checkSelfPermission(
-        this,
-        android.Manifest.permission.READ_CONTACTS
-    ) == PackageManager.PERMISSION_GRANTED
-
-    private fun requestPermission() = ActivityCompat.requestPermissions(
-        this,
-        arrayOf(android.Manifest.permission.READ_CONTACTS),
-        REQUEST_CODE_CONTACTS
-    )
+    private fun requestContactsPermission() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(android.Manifest.permission.READ_CONTACTS),
+            REQUEST_CODE_CONTACTS
+        )
+    }
 
     companion object {
         private const val REQUEST_CODE_CONTACTS = 1

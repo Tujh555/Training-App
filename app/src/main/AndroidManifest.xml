@@ -19,7 +19,8 @@
         <service
             android:name=".ContactsService"
             android:enabled="true"
-            android:exported="true"/>
+            android:exported="true"
+            android:permission="android.permission.READ_CONTACTS" />
 
         <activity
             android:name=".MainActivity"
