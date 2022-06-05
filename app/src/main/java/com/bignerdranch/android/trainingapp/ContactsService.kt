@@ -6,14 +6,15 @@ import android.os.Binder
 import android.os.IBinder
 import android.provider.ContactsContract
 import android.util.Log
+import com.bignerdranch.android.trainingapp.models.Contact
 
 class ContactsService : Service() {
     private val binder = ContactsBinder()
-    private val contacts = mutableListOf<String>()
+    private val contacts = mutableListOf<Contact>()
 
     override fun onBind(p0: Intent?): IBinder = binder
 
-    fun loadContacts(): List<String> {
+    fun loadContacts(): List<Contact> {
         val cursor = contentResolver.query(
             ContactsContract.Contacts.CONTENT_URI,
             null,
@@ -23,11 +24,28 @@ class ContactsService : Service() {
 
         return cursor?.let {
             while (it.moveToNext()) {
-                val columnIndex = it.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY)
 
-                if (columnIndex >= 0) {
-                    contacts.add(it.getString(columnIndex))
+                val columnIndexName = it.getColumnIndex(
+                    ContactsContract.Contacts.DISPLAY_NAME_PRIMARY
+                )
+                val columnIndexPhoneNumber = it.getColumnIndex(
+                    ContactsContract.CommonDataKinds.Phone.NUMBER
+                )
+
+                val newContact = Contact().apply {
+                    name = if (columnIndexName > 0) {
+                        it.getString(columnIndexName)
+                    } else {
+                        name
+                    }
+                    phoneNumber = if (columnIndexPhoneNumber > 0) {
+                        it.getString(columnIndexPhoneNumber)
+                    } else {
+                        phoneNumber
+                    }
                 }
+
+                contacts.add(newContact)
             }
 
             it.close()

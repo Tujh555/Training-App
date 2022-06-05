@@ -1,126 +1,49 @@
 package com.bignerdranch.android.trainingapp
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
-import android.content.pm.PackageManager
+
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.IBinder
-import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.core.view.isGone
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
+import android.view.View
 import com.bignerdranch.android.trainingapp.databinding.ActivityMainBinding
-import com.bignerdranch.android.trainingapp.recyclerview.ContactsAdapter
+import com.bignerdranch.android.trainingapp.fragments.FirstFragment
 
-class MainActivity : AppCompatActivity() {
-    private lateinit var service: ContactsService
-    private var isServiceBound = false
-
-    private val viewModel by lazy {
-        ViewModelProvider(this).get(MainActivityViewModel::class.java)
-    }
-
-    private val binding: ActivityMainBinding by lazy {
+class MainActivity : AppCompatActivity(), Callback {
+    private val vb by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
-    private val permissionContactsReceived: Boolean
-        get() = ActivityCompat.checkSelfPermission(
-            this,
-            android.Manifest.permission.READ_CONTACTS
-        ) == PackageManager.PERMISSION_GRANTED
-
-    private val connection = object : ServiceConnection {
-        override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
-            p1?.let {
-                val binder = it as ContactsService.ContactsBinder
-                service = binder.getService()
-                isServiceBound = true
-            }
+    private val secondActivityButtonListener = View.OnClickListener {
+        SecondActivity.getLaunchingIntent(this, vb.sentDataEditText.text.toString()).also {
+            startActivity(it)
         }
+    }
 
-        override fun onServiceDisconnected(p0: ComponentName?) {
-            isServiceBound = false
-        }
+    private val firstFragmentButtonListener = View.OnClickListener {
+        val msg = vb.sentDataEditText.text.toString()
+        setConstraintLayoutVisibility(View.GONE)
+
+        supportFragmentManager.beginTransaction()
+            .add(vb.fragmentContainer.id, FirstFragment.newInstance(msg))
+            .addToBackStack(null)
+            .commit()
+    }
+
+    private val navigateToFirstGraphFragmentListener = View.OnClickListener {
+        setConstraintLayoutVisibility(View.GONE)
+        vb.navContainer.visibility = View.VISIBLE
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(binding.root)
+        setContentView(vb.root)
+        vb.navContainer.visibility = View.GONE
 
-        binding.contactsList.layoutManager = LinearLayoutManager(this)
-
-        binding.getContactsButton.setOnClickListener {
-            if (isServiceBound && permissionContactsReceived) {
-                updateUI()
-            } else {
-                requestContactsPermission()
-            }
-        }
+        vb.navigateToSecondActivityButton.setOnClickListener(secondActivityButtonListener)
+        vb.navigateToFirstFragmentButton.setOnClickListener(firstFragmentButtonListener)
+        vb.navigateToFirstGraphFragment.setOnClickListener(navigateToFirstGraphFragmentListener)
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        bindContactsService()
-    }
-
-    override fun onStop() {
-        super.onStop()
-
-        unbindService(connection)
-        isServiceBound = false
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if (requestCode == REQUEST_CODE_CONTACTS
-            && grantResults.isNotEmpty()
-            && grantResults[0] == PackageManager.PERMISSION_GRANTED
-        ) {
-            bindContactsService()
-        }
-    }
-
-    private fun bindContactsService() {
-        Intent(this, ContactsService::class.java).also { intent ->
-            bindService(intent, connection, Context.BIND_AUTO_CREATE)
-        }
-    }
-
-    private fun getContacts(): List<String> {
-        if (viewModel.contacts == null) {
-            viewModel.contacts = service.loadContacts()
-        }
-
-        return viewModel.contacts ?: emptyList()
-    }
-
-    private fun updateUI() {
-        val contacts = getContacts()
-
-        binding.contactsList.adapter = ContactsAdapter(contacts)
-        binding.hintTextView.isGone = contacts.isNotEmpty()
-    }
-
-    private fun requestContactsPermission() {
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(android.Manifest.permission.READ_CONTACTS),
-            REQUEST_CODE_CONTACTS
-        )
-    }
-
-    companion object {
-        private const val REQUEST_CODE_CONTACTS = 1
+    override fun setConstraintLayoutVisibility(visibility: Int) {
+        vb.constraintLayout.visibility = visibility
     }
 }

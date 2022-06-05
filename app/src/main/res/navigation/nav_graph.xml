@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/firstGraphFragment2">
+
+    <fragment
+        android:id="@+id/firstGraphFragment2"
+        android:name="com.bignerdranch.android.trainingapp.fragments.FirstGraphFragment"
+        android:label="FirstGraphFragment" >
+        <action
+            android:id="@+id/action_firstGraphFragment2_to_secondGraphFragment2"
+            app:destination="@id/secondGraphFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/secondGraphFragment2"
+        android:name="com.bignerdranch.android.trainingapp.fragments.SecondGraphFragment"
+        android:label="SecondGraphFragment" >
+        <argument
+            android:name="firstFragmentMessage"
+            app:argType="string"
+            android:defaultValue="Ничего не передано" />
+        <action
+            android:id="@+id/action_secondGraphFragment2_to_firstGraphFragment22"
+            app:destination="@id/firstGraphFragment2" />
+    </fragment>
+
+</navigation>

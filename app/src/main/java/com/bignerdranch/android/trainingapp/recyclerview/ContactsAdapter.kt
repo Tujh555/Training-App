@@ -4,8 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bignerdranch.android.trainingapp.R
+import com.bignerdranch.android.trainingapp.models.Contact
 
-class ContactsAdapter(private val contacts: List<String>) : RecyclerView.Adapter<ContactHolder>() {
+class ContactsAdapter(private val contacts: List<Contact>) : RecyclerView.Adapter<ContactHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.list_contact_item, parent, false)

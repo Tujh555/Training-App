@@ -2,4 +2,11 @@
     <string name="app_name">Training App</string>
     <string name="get_contacts_button_text">Get Contacts</string>
     <string name="hint_text">Здесь будет отображаться список контактов</string>
+    <string name="second_activity_button_text">Back to Activity 1</string>
+    <string name="edit_text_hint">Write your message</string>
+    <string name="navigate_to_second_activity_button_text">Go to Second activity</string>
+    <string name="navigate_to_first_fragment_button_text">Go to First fragment</string>
+    <string name="navigate_to_second_fragment_button_text">Go to Second fragment</string>
+    <string name="navigate_to_second_graph_fragment_button_text">Go to Second graph fragment</string>
+    <string name="navigate_to_first_graph_fragment_button_text">Go to First graph fragment</string>
 </resources>
