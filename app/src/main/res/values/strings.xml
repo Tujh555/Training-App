@@ -9,4 +9,9 @@
     <string name="navigate_to_second_fragment_button_text">Go to Second fragment</string>
     <string name="navigate_to_second_graph_fragment_button_text">Go to Second graph fragment</string>
     <string name="navigate_to_first_graph_fragment_button_text">Go to First graph fragment</string>
+    <string name="search_hiking">Search Hiking</string>
+    <string name="crate_new">Crate new</string>
+    <string name="print_your_summer_memories">Print your summer memories</string>
+    <string name="enjoy_free_shipping_on_photo_books">Enjoy free shipping on photo books</string>
+    <string name="photo_book">Photo book</string>
 </resources>
