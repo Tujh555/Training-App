@@ -10,17 +10,44 @@
         android:name="com.bignerdranch.android.trainingapp.ui.fragments.MainFragment"
         android:label="MainFragment"
         tools:layout="@layout/fragment_main">
-
         <action
-            android:id="@+id/action_mainFragment_to_secondFragment"
-            app:destination="@id/secondFragment" />
-
+            android:id="@+id/action_mainFragment_to_getDataFragment"
+            app:destination="@id/getDataFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_fragmentSelectionDialog"
+            app:destination="@id/fragmentSelectionDialog" />
     </fragment>
 
     <fragment
-        android:id="@+id/secondFragment"
-        android:name="com.bignerdranch.android.trainingapp.ui.fragments.SecondFragment"
-        android:label="SecondFragment"
-        tools:layout="@layout/fragment_second"/>
+        android:id="@+id/getDataFragment"
+        android:name="com.bignerdranch.android.trainingapp.ui.fragments.GetDataFragment"
+        android:label="GetDataFragment"
+        tools:layout="@layout/fragment_get_data">
+        <action
+            android:id="@+id/action_getDataFragment_to_lastFragment"
+            app:destination="@id/lastFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/lastFragment"
+        android:name="com.bignerdranch.android.trainingapp.ui.fragments.LastFragment"
+        android:label="LastFragment"
+        tools:layout="@layout/fragment_last">
+        <action
+            android:id="@+id/action_lastFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+        <argument
+            android:name="contactData"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragmentSelectionDialog"
+        android:name="com.bignerdranch.android.trainingapp.ui.fragments.dialogs.FragmentSelectionDialog"
+        android:label="FragmentSelectionDialog" >
+        <action
+            android:id="@+id/action_fragmentSelectionDialog_to_getDataFragment"
+            app:destination="@id/getDataFragment" />
+    </fragment>
 
 </navigation>

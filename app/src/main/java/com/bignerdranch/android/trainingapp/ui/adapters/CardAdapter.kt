@@ -9,6 +9,9 @@ import com.bignerdranch.android.trainingapp.databinding.CardViewHolderBinding
 class CardAdapter : RecyclerView.Adapter<CardAdapter.CardViewHolder>() {
     private val items = mutableListOf<Memory>()
 
+    var cardImageClickListener: CardImageClickListener? = null
+    var cardImageLongClickListener: CardImageLongClickListener? = null
+
     fun setList(list: List<Memory>) {
         items.clear()
         items.addAll(list)
@@ -27,15 +30,27 @@ class CardAdapter : RecyclerView.Adapter<CardAdapter.CardViewHolder>() {
 
     override fun getItemCount() = items.size
 
-    class CardViewHolder(private val binding: CardViewHolderBinding) :
+    inner class CardViewHolder(private val binding: CardViewHolderBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
             fun bind(card: Memory) {
                 binding.run {
                     title.text = card.title
                     subTitle.text = card.description
+                    image.setOnClickListener { cardImageClickListener?.onClick() }
+                    image.setOnLongClickListener {
+                        cardImageLongClickListener?.onLongClick()
+                        true
+                    }
                 }
             }
     }
 
+    fun interface CardImageClickListener {
+        fun onClick()
+    }
+
+    fun interface CardImageLongClickListener {
+        fun onLongClick()
+    }
 }

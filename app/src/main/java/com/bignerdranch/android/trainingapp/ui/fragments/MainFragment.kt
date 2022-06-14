@@ -5,7 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bignerdranch.android.trainingapp.MainApplication
 import com.bignerdranch.android.trainingapp.R
 import com.bignerdranch.android.trainingapp.data.Icon
 import com.bignerdranch.android.trainingapp.data.Memory
@@ -13,12 +15,25 @@ import com.bignerdranch.android.trainingapp.databinding.FragmentMainBinding
 import com.bignerdranch.android.trainingapp.ui.adapters.CardAdapter
 import com.bignerdranch.android.trainingapp.ui.adapters.IconAdapter
 import com.bignerdranch.android.trainingapp.ui.adapters.decoration.IconDecoration
+import com.bignerdranch.android.trainingapp.ui.fragments.dialogs.FragmentSelectionDialog
 
 class MainFragment : Fragment(R.layout.fragment_main) {
     private var binding: FragmentMainBinding? = null
 
     private val iconAdapter by lazy { IconAdapter() }
     private val cardAdapter by lazy { CardAdapter() }
+
+    private val cardImageClickListener = CardAdapter.CardImageClickListener {
+        MainFragmentDirections.actionMainFragmentToGetDataFragment().let { navDirections ->
+            findNavController().navigate(navDirections)
+        }
+    }
+
+    private val cardImageLongClickListener = CardAdapter.CardImageLongClickListener {
+        MainFragmentDirections.actionMainFragmentToFragmentSelectionDialog().also { navDirections ->
+            findNavController().navigate(navDirections)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,6 +48,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        cardAdapter.cardImageClickListener = cardImageClickListener
+        cardAdapter.cardImageLongClickListener = cardImageLongClickListener
+
         binding?.run {
             iconList.adapter = iconAdapter
             iconList.layoutManager = LinearLayoutManager(
@@ -44,6 +62,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
             cardList.adapter = cardAdapter
             cardList.layoutManager = LinearLayoutManager(requireContext())
+
         }
         cardAdapter.setList(list)
         iconAdapter.setList(iconList)

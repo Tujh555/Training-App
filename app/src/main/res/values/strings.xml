@@ -14,4 +14,13 @@
     <string name="print_your_summer_memories">Print your summer memories</string>
     <string name="enjoy_free_shipping_on_photo_books">Enjoy free shipping on photo books</string>
     <string name="photo_book">Photo book</string>
+    <string name="get_data">Get Data</string>
+    <string name="received_data_text">Полученные данные от worker: %1$s</string>
+    <string name="received_data_last_fragment">Данные, полученные от предыдущего фрагмента: %1$s</string>
+    <string name="go_to_mainfragment">Go to MainFragment</string>
+    <string name="sent_data">Sent Data</string>
+    <string name="choose_getdatafragment">Choose GetDataFragment</string>
+    <string name="choose_uploadusersfragment">Choose UploadUsersFragment</string>
+
+    <string name="select_fragment_title">Please, select fragment</string>
 </resources>
